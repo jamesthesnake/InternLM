@@ -21,13 +21,22 @@
 [🛠️Installation](./doc/en/install.md) |
 [📊Train Performance](./doc/en/train_performance.md) |
 [👀Model](#model-zoo) |
+[🤗HuggingFace](https://huggingface.co/spaces/internlm/InternLM-Chat-7B) |
 [🆕Update News](./CHANGE_LOG.md) |
 [🤔Reporting Issues](https://github.com/InternLM/InternLM/issues/new)
 
 [English](./README.md) |
-[简体中文](./README-zh-Hans.md)
+[简体中文](./README-zh-Hans.md) |
+[日本語](./README-ja-JP.md)
 
 </div>
+
+<p align="center">
+    👋 join us on <a href="https://twitter.com/intern_lm" target="_blank">Twitter</a>, <a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> and <a href="https://r.vansin.top/?r=internwx" target="_blank">WeChat</a>
+</p>
+
+
+
 
 ## Introduction
 
@@ -116,21 +125,22 @@ We use [LMDeploy](https://github.com/InternLM/LMDeploy) to complete the one-clic
 
 1. First, install LMDeploy:
 
-```
-  python3 -m pip install lmdeploy
-```
+    ```bash
+    python3 -m pip install lmdeploy
+    ```
 
 2. Use the following command for quick deployment:
 
-```
-  python3 -m lmdeploy.serve.turbomind.deploy InternLM-7B /path/to/internlm-7b/model hf
-```
+    ```bash
+    python3 -m lmdeploy.serve.turbomind.deploy internlm-chat-7b /path/to/internlm-chat-7b/model
+    ```
 
 3. After exporting the model, you can start a server and have a conversation with the deployed model using the following command:
-
-```
-  python3 -m lmdeploy.serve.client {server_ip_addresss}:33337
-```
+   
+    ```bash
+    bash workspace/service_docker_up.sh
+    python3 -m lmdeploy.serve.client {server_ip_addresss}:33337
+    ```
 
 [LMDeploy](https://github.com/InternLM/LMDeploy) provides a complete workflow for deploying InternLM. Please refer to the [deployment tutorial](https://github.com/InternLM/LMDeploy) for more details on deploying InternLM.
 
@@ -142,10 +152,10 @@ Please refer to [Usage Tutorial](./doc/en/usage.md) to start InternLM installati
 
 ### Convert to Transformers Format
 
-The model trained by InternLM can be easily converted to HuggingFace Transformers format, which is convenient for seamless docking with various open source projects in the community. With the help of `tools/convert2hf.py`, the weights saved during training can be converted into transformers format with one command
+The model trained by InternLM can be easily converted to HuggingFace Transformers format, which is convenient for seamless docking with various open source projects in the community. With the help of `tools/transformers/convert2hf.py`, the weights saved during training can be converted into transformers format with one command
 
 ```bash
-python convert2hf.py --src_folder origin_ckpt/ --tgt_folder hf_ckpt/ --tokenizer tokenizes/tokenizer.model
+python tools/transformers/convert2hf.py --src_folder origin_ckpt/ --tgt_folder hf_ckpt/ --tokenizer ./tools/V7_sft.model
 ```
 
 After conversion, it can be loaded as transformers by the following code
@@ -165,10 +175,10 @@ Please refer to the [System Architecture document](./doc/en/structure.md) for fu
 
 InternLM deeply integrates Flash-Attention, Apex and other high-performance model operators to improve training efficiency. By building the Hybrid Zero technique, it achieves efficient overlap of computation and communication, significantly reducing cross-node communication traffic during training. InternLM supports expanding the 7B model from 8 GPUs to 1024 GPUs, with an acceleration efficiency of up to 90% at the thousand-GPU scale, a training throughput of over 180 TFLOPS, and an average of over 3600 tokens per GPU per second. The following table shows InternLM's scalability test data at different configurations:
 
-| Number of GPUs | 8    | 16   | 32   | 64   | 128  | 256  | 512  | 1024 |
-| -------------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-| TGS            | 4078 | 3939 | 3919 | 3944 | 3928 | 3920 | 3835 | 3625 |
-| TFLOPS         | 192  | 192  | 186  | 186  | 185  | 185  | 186  | 182  |
+| GPU Number         | 8   | 16  | 32  | 64  | 128  | 256  | 512  | 1024  |
+| ---------------- | ---- | ---- | ---- | ---- | ----- | ----- | ----- | ------ |
+| TGS | 4078 | 3939 | 3919 | 3944 | 3928  | 3920  | 3835  | 3625   |
+| TFLOPS  | 193 | 191  | 188  | 188  | 187   | 185   | 186   | 184    |
 
 TGS represents the average number of tokens processed per GPU per second. For more performance test data, please refer to the [Training Performance document](./doc/en/train_performance.md) for further details.
 
