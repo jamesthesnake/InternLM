@@ -5,7 +5,7 @@ set -x
 readonly CKPTS_PATH="$GITHUB_WORKSPACE/llm_ckpts"
 readonly CKPTS20_PATH="$GITHUB_WORKSPACE/llm_ckpts/20"
 readonly CKPTS20_OUTPUT="${CKPTS20_PATH}/*.pt"
-expected_num=21
+expected_num=22
 exit_code=0
 
 source ./ci_scripts/common/basic_func.sh
@@ -19,18 +19,12 @@ if [[ -d ${CKPTS20_PATH} ]]; then
     fi
 fi
 
-srun -p llm --quotatype=spot -n 8 --ntasks-per-node=8 --gpus-per-task=1 python train.py --config ./ci_scripts/train/ci_7B_sft.py
+srun -p ${SLURM_PARTITION} --exclusive --job-name=$1 -n 8 --ntasks-per-node=8 --gpus-per-task=1 python train.py --config ./ci_scripts/train/ci_7B_sft.py
 [[ $? -ne 0 ]] && { echo "test slurm training failed.";  exit_code=$(($exit_code + 1)); }
 
 num=$(num_files "${CKPTS20_OUTPUT}")
 if [[ ${num} -ne ${expected_num} ]]; then
     echo "expect: ${expected_num} files, actual: ${num} files."
-    exit_code=$(($exit_code + 1)) 
-fi
-
-# clean the test files.
-if ! rm -rf ${CKPTS_PATH}/*; then
-    echo "cleaning cached file in ${CKPTS_PATH} failed."
     exit_code=$(($exit_code + 1))
 fi
 

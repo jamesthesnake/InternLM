@@ -12,7 +12,7 @@ exit_code=0
 
 source ./ci_scripts/common/basic_func.sh
 
-echo "start to test tokenizer.py." 
+echo "start to test tokenizer.py."
 
 num=$(num_files "${RESULTS}")
 if [[ ${num} -gt 0 ]]; then
@@ -22,7 +22,7 @@ if [[ ${num} -gt 0 ]]; then
     fi
 fi
 
-srun -p llm python tools/tokenizer.py --text_input_path ${DATA} --bin_output_path ${RESULT}
+srun -p ${SLURM_PARTITION} --job-name=$1 --gpus-per-task=1 python tools/tokenizer.py --text_input_path ${DATA} --bin_output_path ${RESULT}
 [[ $? -ne 0 ]] && { echo "test tokenizer.py failed.";  exit_code=$(($exit_code + 1)); }
 
 file_list=($RESULT $RESULT_META)
